@@ -4,15 +4,15 @@ import { asyncHandler } from "../../core/asyncHandler";
 import { ApiError } from "../../core/ApiError";
 
 /**
- * `functional_trainings` table — admin-managed per-team training links
- * shown on the frontend's Functional Training page.
+ * `functional_trainings` table — individual training links (modules), each
+ * belonging to a `functional_training_topics` row via `topic_id`.
  */
 export const functionalTrainingsRepository = new BaseRepository("functional_trainings");
 
 const router = createResourceRouter(functionalTrainingsRepository, "FunctionalTraining");
 
 type FunctionalTrainingBody = {
-  team?: string;
+  topicId?: number | string;
   title?: string;
   link?: string;
   sortOrder?: number;
@@ -25,14 +25,14 @@ router.post(
   "/",
   asyncHandler(async (req, res) => {
     const body = (req.body ?? {}) as FunctionalTrainingBody;
-    const { team, title, link } = body;
+    const { topicId, title, link } = body;
 
-    if (!team?.trim() || !title?.trim() || !link?.trim()) {
-      throw ApiError.badRequest("team, title, and link are required.");
+    if (!topicId || !title?.trim() || !link?.trim()) {
+      throw ApiError.badRequest("topicId, title, and link are required.");
     }
 
     const row = await functionalTrainingsRepository.insert({
-      team: team.trim(),
+      topic_id: topicId,
       title: title.trim(),
       link: link.trim(),
       sort_order: typeof body.sortOrder === "number" ? body.sortOrder : 0,
@@ -51,13 +51,13 @@ router.patch(
     const body = (req.body ?? {}) as FunctionalTrainingBody;
 
     const updates: Record<string, unknown> = { updated_at: new Date() };
-    if (typeof body.team === "string" && body.team.trim()) updates.team = body.team.trim();
+    if (body.topicId) updates.topic_id = body.topicId;
     if (typeof body.title === "string" && body.title.trim()) updates.title = body.title.trim();
     if (typeof body.link === "string" && body.link.trim()) updates.link = body.link.trim();
     if (typeof body.sortOrder === "number") updates.sort_order = body.sortOrder;
 
     if (Object.keys(updates).length === 1) {
-      throw ApiError.badRequest("No valid fields to update (team, title, link, or sortOrder).");
+      throw ApiError.badRequest("No valid fields to update (topicId, title, link, or sortOrder).");
     }
 
     const row = await functionalTrainingsRepository.update(req.params.id, updates);

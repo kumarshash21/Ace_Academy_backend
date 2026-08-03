@@ -11,6 +11,7 @@ import certificationsRoutes from "../modules/certifications/certifications.modul
 import progressRoutes from "../modules/progress/progress.module";
 import assessmentsRoutes from "../modules/assessments/assessments.module";
 import functionalTrainingsRoutes from "../modules/functional_trainings/functional_trainings.module";
+import functionalTrainingTopicsRoutes from "../modules/functional_training_topics/functional_training_topics.module";
 
 /**
  * Aggregates every table module's router under /api.
@@ -35,5 +36,6 @@ apiRouter.use("/certifications", certificationsRoutes);
 apiRouter.use("/progress", progressRoutes);
 apiRouter.use("/assessments", assessmentsRoutes);
 apiRouter.use("/functional_trainings", functionalTrainingsRoutes);
+apiRouter.use("/functional_training_topics", functionalTrainingTopicsRoutes);
 
 export default apiRouter;
